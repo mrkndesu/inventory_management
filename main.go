@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -118,8 +118,7 @@ func main() {
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	fmt.Println("サーバーが http://localhost:8080 で起動しました")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Println("サーバーエラー:", err)
+		log.Println("サーバーエラー:", err)
 	}
 }
