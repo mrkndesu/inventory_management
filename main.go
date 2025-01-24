@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
+	"runtime"
 	"strconv"
 	"sync"
 )
@@ -109,6 +111,23 @@ func resetInventory(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func openBrowser(url string) {
+	var err error
+	switch runtime.GOOS {
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	default:
+		log.Println("ブラウザの自動起動に対応していません")
+	}
+	if err != nil {
+		log.Printf("ブラウザの起動に失敗しました: %v\n", err)
+	}
+}
+
 func main() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/add-item", addItem)
@@ -117,6 +136,12 @@ func main() {
 	http.HandleFunc("/reset", resetInventory)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+	go func() {
+		url := "http://localhost:8080"
+		log.Printf("ブラウザでサーバーを起動します: %s\n", url)
+		openBrowser(url)
+	}()
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Println("サーバーエラー:", err)
