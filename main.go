@@ -25,7 +25,7 @@ var (
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("templates/index.html")
+	tmpl, err := template.ParseFiles("index.html")
 	if err != nil {
 		http.Error(w, "テンプレートの読み込みに失敗しました: "+err.Error(), http.StatusInternalServerError)
 		return
